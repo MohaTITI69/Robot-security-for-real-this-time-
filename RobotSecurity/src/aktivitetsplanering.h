@@ -25,7 +25,6 @@ struct Vertex {
     float y;
     std::vector<Vertex*> neighbors;
     std::vector<float> distance;
-    std::vector<float> heading;
     int room;
     bool checked;
     int id;
@@ -37,7 +36,7 @@ struct nodeRobot
     String macAddress;
     double battery = 100.0;
     int taskedRoom = 0;
-    Vertex currentVertex;
+    Vertex* currentVertex;
     Position* pos;
 };
 
@@ -70,7 +69,7 @@ void runningReceiveMessages(void * parameter);
 void broadcast(Message message);
 void sendMessageToServer();
 void moveTo(Vertex from, Vertex to);
-std::vector<Vertex> navigate(Vertex startPos, Vertex endPos);
+std::vector<Vertex> getPath(Vertex startPos, Vertex endPos);
 Vertex getPosition();
 void detectObjects();
 void detectObstacles();

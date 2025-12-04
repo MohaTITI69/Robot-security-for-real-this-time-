@@ -4,6 +4,7 @@
 #include <limits>
 #include "Communication.h"
 #include "Detection.h"
+#include "movement.hpp"
 
 
 #define TRIG_PIN 13
@@ -37,61 +38,63 @@ void setupVertexes()
 {
     nodeList = 
     {
-    {15.72f, 40.74f, {}, {}, {}, 0, false, 0},
-    {15.72f, 38.46f, {}, {}, {}, 1, false, 1},
-    {21.84f, 35.04f, {}, {}, {}, 1, false, 2},
-    {21.72f, 31.26f, {}, {}, {}, 1, false, 3},
-    {21.78f, 26.94f, {}, {}, {}, 1, false, 4},
-    {21.72f, 22.56f, {}, {}, {}, 1, false, 5},
-    {21.78f, 18.54f, {}, {}, {}, 1, false, 6},
-    {21.72f, 14.40f, {}, {}, {}, 1, false, 7},
-    {21.78f, 10.32f, {}, {}, {}, 1, false, 8},
-    {15.84f,  5.04f, {}, {}, {}, 1, false, 9},
-    {10.14f,  9.78f, {}, {}, {}, 1, false, 10},
-    {10.14f, 14.82f, {}, {}, {}, 1, false, 11},
-    {10.08f, 18.90f, {}, {}, {}, 1, false, 12},
-    {10.14f, 23.04f, {}, {}, {}, 1, false, 13},
-    {10.02f, 27.36f, {}, {}, {}, 1, false, 14},
-    {10.14f, 31.26f, {}, {}, {}, 1, false, 15},
-    {10.02f, 35.58f, {}, {}, {}, 1, false, 16},
-    {15.72f, 23.16f, {}, {}, {}, 1, false, 17},
-    {15.84f, 50.28f, {}, {}, {}, 0, false, 18},
-    {15.84f, 48.00f, {}, {}, {}, 2, false, 19},
-    {21.60f, 43.68f, {}, {}, {}, 2, false, 20},
-    {15.72f, 42.12f, {}, {}, {}, 2, false, 21},
-    { 8.28f, 43.98f, {}, {}, {}, 2, false, 22},
-    {14.52f, 91.74f, {}, {}, {}, 0, false, 23},
-    {14.52f, 87.30f, {}, {}, {}, 3, false, 24},
-    {30.42f, 85.98f, {}, {}, {}, 3, false, 25},
-    {29.40f, 78.66f, {}, {}, {}, 3, false, 26},
-    {32.34f, 78.54f, {}, {}, {}, 0, false, 27},
-    {29.22f, 74.22f, {}, {}, {}, 3, false, 28},
-    {30.30f, 70.50f, {}, {}, {}, 3, false, 29},
-    {30.30f, 66.90f, {}, {}, {}, 3, false, 30},
-    {30.30f, 62.70f, {}, {}, {}, 3, false, 31},
-    {30.30f, 58.50f, {}, {}, {}, 3, false, 32},
-    {30.30f, 54.30f, {}, {}, {}, 3, false, 33},
-    {24.00f, 52.32f, {}, {}, {}, 3, false, 34},
-    {15.84f, 52.56f, {}, {}, {}, 3, false, 35},
-    {10.20f, 54.78f, {}, {}, {}, 3, false, 36},
-    {10.20f, 58.68f, {}, {}, {}, 3, false, 37},
-    {10.20f, 62.88f, {}, {}, {}, 3, false, 38},
-    {10.20f, 66.48f, {}, {}, {}, 3, false, 39},
-    {10.20f, 70.80f, {}, {}, {}, 3, false, 40},
-    {10.20f, 74.58f, {}, {}, {}, 3, false, 41},
-    {10.20f, 78.72f, {}, {}, {}, 3, false, 42},
-    {10.20f, 82.62f, {}, {}, {}, 3, false, 43},
-    {10.20f, 86.82f, {}, {}, {}, 3, false, 44},
-    {21.06f, 78.66f, {}, {}, {}, 3, false, 45},
-    {18.60f, 65.10f, {}, {}, {}, 3, false, 46}
+    {15.72f, 40.74f, {}, {}, 0, false, 0},
+    {15.72f, 38.46f, {}, {}, 1, false, 1},
+    {21.84f, 35.04f, {}, {}, 1, false, 2},
+    {21.72f, 31.26f, {}, {}, 1, false, 3},
+    {21.78f, 26.94f, {}, {}, 1, false, 4},
+    {21.72f, 22.56f, {}, {}, 1, false, 5},
+    {21.78f, 18.54f, {}, {}, 1, false, 6},
+    {21.72f, 14.40f, {}, {}, 1, false, 7},
+    {21.78f, 10.32f, {}, {}, 1, false, 8},
+    {15.84f,  5.04f, {}, {}, 1, false, 9},
+    {10.14f,  9.78f, {}, {}, 1, false, 10},
+    {10.14f, 14.82f, {}, {}, 1, false, 11},
+    {10.08f, 18.90f, {}, {}, 1, false, 12},
+    {10.14f, 23.04f, {}, {}, 1, false, 13},
+    {10.02f, 27.36f, {}, {}, 1, false, 14},
+    {10.14f, 31.26f, {}, {}, 1, false, 15},
+    {10.02f, 35.58f, {}, {}, 1, false, 16},
+    {15.72f, 23.16f, {}, {}, 1, false, 17},
+    {15.84f, 50.28f, {}, {}, 0, false, 18},
+    {15.84f, 48.00f, {}, {}, 2, false, 19},
+    {21.60f, 43.68f, {}, {}, 2, false, 20},
+    {15.72f, 42.12f, {}, {}, 2, false, 21},
+    { 8.28f, 43.98f, {}, {}, 2, false, 22},
+    {14.52f, 91.74f, {}, {}, 0, false, 23},
+    {14.52f, 87.30f, {}, {}, 3, false, 24},
+    {30.42f, 85.98f, {}, {}, 3, false, 25},
+    {29.40f, 78.66f, {}, {}, 3, false, 26},
+    {32.34f, 78.54f, {}, {}, 0, false, 27},
+    {29.22f, 74.22f, {}, {}, 3, false, 28},
+    {30.30f, 70.50f, {}, {}, 3, false, 29},
+    {30.30f, 66.90f, {}, {}, 3, false, 30},
+    {30.30f, 62.70f, {}, {}, 3, false, 31},
+    {30.30f, 58.50f, {}, {}, 3, false, 32},
+    {30.30f, 54.30f, {}, {}, 3, false, 33},
+    {24.00f, 52.32f, {}, {}, 3, false, 34},
+    {15.84f, 52.56f, {}, {}, 3, false, 35},
+    {10.20f, 54.78f, {}, {}, 3, false, 36},
+    {10.20f, 58.68f, {}, {}, 3, false, 37},
+    {10.20f, 62.88f, {}, {}, 3, false, 38},
+    {10.20f, 66.48f, {}, {}, 3, false, 39},
+    {10.20f, 70.80f, {}, {}, 3, false, 40},
+    {10.20f, 74.58f, {}, {}, 3, false, 41},
+    {10.20f, 78.72f, {}, {}, 3, false, 42},
+    {10.20f, 82.62f, {}, {}, 3, false, 43},
+    {10.20f, 86.82f, {}, {}, 3, false, 44},
+    {21.06f, 78.66f, {}, {}, 3, false, 45},
+    {18.60f, 65.10f, {}, {}, 3, false, 46}
     };
 
-    auto link = [&](int from, int to, float dist, float head){
+    auto link = [&](int from, int to, float dist, float head)
+    {
     nodeList[from].neighbors.push_back(&nodeList[to]);
     nodeList[from].distance.push_back(dist);
-    nodeList[from].heading.push_back(head);
-};
+    };
 
+    {
+//ta bort headings??
 // node1
 link(0, 1, 2.28f, 90.f);
 link(0, 21, 1.38f, 270.f);
@@ -249,8 +252,35 @@ link(45, 46, 13.7813f, 100.28f);
 // node47
 link(46, 45, 13.7813f, 280.28f);
 link(46, 35, 12.8401f, 102.41f);
+}
 
+}
 
+Vertex* getVertex(const float x, const float y) {
+    for (Vertex& v : nodeList) {
+        if (v.x == x && v.y == y) {
+            return &v;
+        }
+    }
+    return nullptr;
+}
+
+float getHeading(const float x1, float y1, const float x2, const float y2) {
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+
+    // Convert to standard math coordinates (y positive upward)
+    float dy_math = -dy;
+
+    float angle_rad = std::atan2(dy_math, dx); // returns value in radians [-pi, pi]
+    float angle_deg = angle_rad * 180.0f / M_PI;
+
+    // Convert to 0-359° range
+    if (angle_deg < 0) {
+        angle_deg += 360.0f;
+    }
+
+    return angle_deg;
 }
 
 void broadcast(Message message) {
@@ -283,12 +313,20 @@ Message receiveMessage() {
 }
 
 
-void moveTo(Vertex from, Vertex to) {
-    // Tar emot W/A/S/D eller liknande styrkommandon
+void navigate(const std::vector<Vertex*>& path) {
+    for (Vertex* v : path) {
+        float heading = getHeading(currentRobot.pos->x, currentRobot.pos->y, v->x, v->y);
+        turn(currentRobot.pos, heading);
+        move_forward(currentRobot.pos, v->x, v->y);
+        currentRobot.currentVertex = getVertex(currentRobot.pos->x, currentRobot.pos->y);
+        if (!currentRobot.currentVertex) {
+            Serial.println("Vertex doesn't exist");
+        }
+    }
 }
 
 
-std::vector<Vertex*> navigate(Vertex* start, Vertex* goal) {
+std::vector<Vertex*> getPath(Vertex* start, Vertex* goal) {
     const int N = static_cast<int>(nodeList.size());
     const float INF = std::numeric_limits<float>::infinity();
 
@@ -366,10 +404,6 @@ String getMac() {
 
 
 
-
-
-
-
 void startNetwork()
 {
 
@@ -442,8 +476,6 @@ String plan() {
     {
         instructions = instructions + ":1:" + robotList[i].macAddress + ":2:" + robotList[i].taskedRoom + ":3:";
     }
-
-    currentTargetRoom = instructions;
     return instructions;
 }
 
@@ -464,7 +496,7 @@ int createMessageId() {
 String createUpdate() {
     //Create message updating current state, currently only pos
     //String message = "<uppdate>|:pos:" + String(currentRobot.pos->x) + "," + String(currentRobot.pos->y) + ":currentVertex:" + currentRobot.currentVertex.id + ":battery:" + String(checkBattery()) + "|";
-    String message = "<Uppdate>:1:" + currentRobot.macAddress + ":2:" + currentRobot.currentVertex.room + ":3:" + currentRobot.taskedRoom + ":4:" + currentRobot.currentVertex.checked + ":5:" + currentRobot.currentVertex.id + ":6:" + currentRobot.battery + ":5:";
+    String message = "<Uppdate>:1:" + currentRobot.macAddress + ":2:" + currentRobot.currentVertex->room + ":3:" + currentRobot.taskedRoom + ":4:" + currentRobot.currentVertex->checked + ":5:" + currentRobot.currentVertex->id + ":6:" + currentRobot.battery + ":5:";
     return message;
 }
 
@@ -576,17 +608,25 @@ void setupNetwork()
     
 }
 
+
 void detectionSetUp(){
     ultrasonicSensor.begin();
     radar.begin();
 }
+
+
 void setUp() {
     // Initial setup-logik
     currentRobot.isMaster = false;
     currentRobot.macAddress = getMac();
+    currentRobot.pos = init_position();
 
     setupVertexes();
-    currentRobot.currentVertex = nodeList[0];
+    currentRobot.currentVertex = getVertex(currentRobot.pos->x, currentRobot.pos->y);
+    if (!currentRobot.currentVertex)
+    {
+        Serial.println("Error: Vertex doesnt existsaddas");
+    }
     robotList.push_back(currentRobot);
 
 
@@ -631,7 +671,7 @@ bool detectMovement() {
     return radar.detectMovement();
 }
 
-void measureDistance() {
+float measureDistance() {
     // Detektera objekt som fönster och tavlor
     float distance = ultrasonicSensor.measureDistance();
     if(distance >= 15){
@@ -640,9 +680,14 @@ void measureDistance() {
     }else{
         Serial.printf("We good");
     }
+    return distance;
 }
 
 void doTask()
 {
 
+}
+
+void quit() {
+    delete currentRobot.pos;
 }

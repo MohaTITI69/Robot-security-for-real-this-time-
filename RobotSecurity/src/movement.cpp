@@ -1,4 +1,4 @@
-//#include <Arduino.h>
+#include <Arduino.h>
 #include <iostream>
 #include <math.h>
 #include "movement.hpp"
@@ -12,9 +12,8 @@ void move_forward(Position* pos, const float target_x, const float target_y) {
             pos->y = target_y;
             break;
         }
-        //delay(UPDATE_INTERVAL);
+        vTaskDelay( UPDATE_INTERVAL/ portTICK_PERIOD_MS);
         update_position(pos, ROTATIONS_PER_SEC, UPDATE_INTERVAL);
-        std::cout << "Position: " << pos->x << ", " << pos->y << "\n";
     }
 }
 
@@ -31,8 +30,7 @@ void turn(Position* pos, const float target_theta) {
             pos->theta = target_theta;
             break;
         }
-        //delay(UPDATE_INTERVAL);
+        vTaskDelay( UPDATE_INTERVAL/ portTICK_PERIOD_MS);
         update_heading(pos, TURN_SPEED, UPDATE_INTERVAL, target_theta, direction);
-        std::cout << "Heading: " << pos->theta << "\n";
     }
 }
