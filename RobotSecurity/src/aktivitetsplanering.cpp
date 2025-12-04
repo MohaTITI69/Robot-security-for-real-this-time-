@@ -356,9 +356,6 @@ String getMac() {
 }
 
 
-void detectObjects() {
-    // Detektera objekt som fönster och tavlor
-}
 
 
 void detectObstacles() {
@@ -486,13 +483,17 @@ void dealWithMessage(Message msg)
         else if(message.indexOf("<instructions>") > -1)
         {
             Serial.println("Master: " + message);
+
+            
             
             int lastInstanceIndex = 0;
             while(message.indexOf(":1:", lastInstanceIndex) != -1)
             {
                 int beginning = message.indexOf(":1:", lastInstanceIndex)+3;
                 int end = message.indexOf(":2:", message.indexOf(":1:", lastInstanceIndex) + 3);
-                Serial.println(message.substring(beginning, end));
+                
+                message.substring(beginning, end);
+
                 lastInstanceIndex = end;
                 
             }
@@ -608,3 +609,11 @@ void alarm() {
 }
 
 
+void detectObjects() {
+    // Detektera objekt som fönster och tavlor
+}
+
+void doTask()
+{
+    
+}
