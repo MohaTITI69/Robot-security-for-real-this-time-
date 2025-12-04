@@ -22,11 +22,17 @@ int countPeers() {
 }
 
 void sortNodes() {
-  std::sort(nodes, nodes+MAX_NODES, [](auto &a, auto &b) {
-    if(!a.inUse || !b.inUse) return a.inUse > b.inUse;
+  std::sort(nodes, nodes + MAX_NODES, [](const Node& a, const Node& b) 
+  {
+    if (!a.inUse || !b.inUse) 
+    {
+      // "true" först, alltså alla inUse=true kommer före inUse=false
+      return a.inUse > b.inUse;
+    }
     return memcmp(a.mac, b.mac, 6) < 0;
   });
 }
+
 
 int insertNodeIfMissing(const uint8_t mac[6]) {
   int idx = findNode(mac);
@@ -53,14 +59,14 @@ int insertNodeIfMissing(const uint8_t mac[6]) {
   return -1;
 }
 
-void onRecv(const esp_now_recv_info* info, const uint8_t* data, int len) {
-  if(!info || !data || len <= 0) return;
+void onRecv(const uint8_t* mac, const uint8_t* data, int len) {
+    if(!mac || !data || len <= 0) return;
 
-  const uint8_t* src = info->src_addr;
-  int idx = insertNodeIfMissing(src);
-  if (idx >= 0) nodes[idx].lastSeen = millis();
+    const uint8_t* src = mac;   // samma idé, bara annan typ
+    int idx = insertNodeIfMissing(src);
+    if (idx >= 0) nodes[idx].lastSeen = millis();
 
-  uint8_t type = data[0];
+    uint8_t type = data[0];
 
   if (type == HELLO) {
     uint8_t buf[1+1+6];
@@ -127,7 +133,7 @@ void nodeTimeoutChecker(void*) {
   }
 }
 
-void onSent(const wifi_tx_info_t*, esp_now_send_status_t status) {
+void onSent(const uint8_t* mac, esp_now_send_status_t status) {
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "TX OK" : "TX FAIL");
 }
 

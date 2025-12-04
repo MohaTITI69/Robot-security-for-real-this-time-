@@ -3,6 +3,17 @@
 #include "position.hpp"
 #include <queue>
 #include <limits>
+#include "Communication.h"
+#include "Detection.h"
+
+
+#define TRIG_PIN 13
+#define ECHO_PIN 14
+#define RADAR_RX_PIN 17
+#define RADAR_TX_PIN 16
+
+UltrasonicSensor ultrasonicSensor(TRIG_PIN,ECHO_PIN);
+RadarSensor radar(Serial1,RADAR_RX_PIN,RADAR_TX_PIN);
 
 // real definitions of globals
 int counter = 0;
@@ -358,9 +369,7 @@ String getMac() {
 
 
 
-void detectObstacles() {
-    // Detektera hinder på marken och i rummet
-}
+
 
 
 void startNetwork()
@@ -433,7 +442,7 @@ String plan() {
     
     for(int i = 0; i < robotList.size(); i++)
     {
-        instructions = instructions + ":1:" + robotList[i].taskedRoom + ":2:" + robotList[i].macAddress + ":3:";
+        instructions = instructions + ":1:" + robotList[i].macAddress + ":2:" + robotList[i].taskedRoom + ":3:";
     }
 
     currentInstruktions = instructions;
@@ -563,7 +572,10 @@ void setupNetwork()
     
 }
 
-
+void detectionSetUp(){
+    ultrasonicSensor.begin();
+    radar.begin();
+}
 void setUp() {
     // Initial setup-logik
     currentRobot.isMaster = false;
@@ -574,6 +586,7 @@ void setUp() {
     robotList.push_back(currentRobot);
 
 
+    detectionSetUp();
 
 
     run();
@@ -608,12 +621,24 @@ void alarm() {
     // Kalla på vakt / larma
 }
 
+bool detectMovement() {
+    // Detektera movement på marken och i rummet
+    //true == movement, false = clear
+    return radar.detectMovement();
+}
 
-void detectObjects() {
+void measureDistance() {
     // Detektera objekt som fönster och tavlor
+    float distance = ultrasonicSensor.measureDistance();
+    if(distance >= 15){
+        //larma samt logga 
+        Serial.printf("Object saknas/dörr öppen/fönster öppne");
+    }else{
+        Serial.printf("We good");
+    }
 }
 
 void doTask()
 {
-    
+
 }

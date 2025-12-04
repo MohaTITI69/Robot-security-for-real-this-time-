@@ -6,6 +6,10 @@
 #include <esp_now.h>
 #include <esp_wifi.h>
 #include <string.h>
+#include "Communication.h"
+#include "Node.h"
+#include <algorithm>
+
 
 #define WIFI_CHANNEL 6
 #define connectedPin 33
@@ -28,10 +32,10 @@ int findNode(const uint8_t mac[6]);
 int countPeers();
 void sortNodes();
 int insertNodeIfMissing(const uint8_t mac[6]);
-void onRecv(const esp_now_recv_info* info, const uint8_t* data, int len);
+void onRecv(const uint8_t* mac, const uint8_t* data, int len);
+void onSent(const uint8_t* mac, esp_now_send_status_t status);
 void heartbeatSender(void*);
 void nodeTimeoutChecker(void*);
-void onSent(const wifi_tx_info_t*, esp_now_send_status_t status);
 void setSelfMacToList();
 void send_msg_bcast(const String& msg);
 void send_msg_mac(const String& msg, const uint8_t* mac);

@@ -11,7 +11,7 @@ void UltrasonicSensor::begin() {
   Serial.println("Ultrasonic sensor initialized");
 }
 
-String UltrasonicSensor::measureDistance() {
+float UltrasonicSensor::measureDistance() {
   float totalDistance = 0;
   int validReadings = 0;
 
@@ -36,16 +36,12 @@ String UltrasonicSensor::measureDistance() {
   }
 
   if (validReadings == 0) {
-    return "No valid measurement";
+    return 0;
   }
 
   float avg = totalDistance / validReadings;
 
-  if (avg > 15.0) {
-    return "LARMA, Distance: " + String(avg, 1) + " cm";
-  } else {
-    return "ITEM STILL HERE, Distance: " + String(avg, 1) + " cm";
-  }
+  return avg;
 }
 
 
@@ -54,7 +50,7 @@ String UltrasonicSensor::measureDistance() {
 RadarSensor::RadarSensor(HardwareSerial &serial, uint8_t rx, uint8_t tx)
   : radarSerial(serial), rxPin(rx), txPin(tx) {}
 
-bool RadarSensor::setup() {
+bool RadarSensor::begin() {
   radarSerial.begin(256000, SERIAL_8N1, rxPin, txPin);
   delay(1000);
 

@@ -9,7 +9,7 @@ class UltrasonicSensor {
   public:
     UltrasonicSensor(uint8_t trigPin, uint8_t echoPin);
     void begin();
-    String measureDistance();
+    float measureDistance();
 
   private:
     uint8_t trigPin;
@@ -21,7 +21,7 @@ class RadarSensor {
   public:
     RadarSensor(HardwareSerial &serial, uint8_t rxPin, uint8_t txPin);
 
-    bool setup();
+    bool begin();
     bool detectMovement();
 
   private:
@@ -39,21 +39,6 @@ class RadarSensor {
     const uint32_t MOVEMENT_THRESHOLD = 1000;
 };
 
-
-class SensorsManager {
-  public:
-    SensorsManager(UltrasonicSensor &ultra, RadarSensor &radar)
-      : ultra(ultra), radar(radar) {}
-
-    void begin() {
-      ultra.begin();
-      radar.setup();
-    }
-
-  private:
-    UltrasonicSensor &ultra;
-    RadarSensor &radar;
-};
 
 
 #endif
