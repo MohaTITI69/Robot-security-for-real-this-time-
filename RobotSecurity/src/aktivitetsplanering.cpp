@@ -1,5 +1,4 @@
 #include "aktivitetsplanering.h"
-#include "test.h"
 #include "position.hpp"
 #include <queue>
 #include <limits>
@@ -24,7 +23,6 @@ nodeRobot currentRobot;
 std::vector<Vertex> nodeList;//positioner
 std::vector<nodeRobot> robotList;//kopplade robbotar
 bool isMaster = false;
-String currentInstruktions;
 
 
 /*
@@ -445,7 +443,7 @@ String plan() {
         instructions = instructions + ":1:" + robotList[i].macAddress + ":2:" + robotList[i].taskedRoom + ":3:";
     }
 
-    currentInstruktions = instructions;
+    currentTargetRoom = instructions;
     return instructions;
 }
 
@@ -466,7 +464,7 @@ int createMessageId() {
 String createUpdate() {
     //Create message updating current state, currently only pos
     //String message = "<uppdate>|:pos:" + String(currentRobot.pos->x) + "," + String(currentRobot.pos->y) + ":currentVertex:" + currentRobot.currentVertex.id + ":battery:" + String(checkBattery()) + "|";
-    String message = "din mam";
+    String message = "<Uppdate>:1:" + currentRobot.macAddress + ":2:" + currentRobot.currentVertex.room + ":3:" + currentRobot.taskedRoom + ":4:" + currentRobot.currentVertex.checked + ":5:" + currentRobot.currentVertex.id + ":6:" + currentRobot.battery + ":5:";
     return message;
 }
 
@@ -488,6 +486,8 @@ void dealWithMessage(Message msg)
         if(message.indexOf("<uppdate>") > -1)
         {
             Serial.println("Master: " + message);
+
+
         }
         else if(message.indexOf("<instructions>") > -1)
         {
@@ -501,15 +501,19 @@ void dealWithMessage(Message msg)
                 int beginning = message.indexOf(":1:", lastInstanceIndex)+3;
                 int end = message.indexOf(":2:", message.indexOf(":1:", lastInstanceIndex) + 3);
                 
-                message.substring(beginning, end);
+                if (message.substring(beginning, end).equals(currentRobot.macAddress))
+                {
+                    beginning = message.indexOf(":2:", lastInstanceIndex)+3;
+                    end = message.indexOf(":3:", message.indexOf(":2:", lastInstanceIndex) + 3);
+
+                    currentRobot.taskedRoom = message.substring(beginning, end).toInt();
+                }
 
                 lastInstanceIndex = end;
                 
             }
                 
         }
-
-
         //Fixaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
     }
