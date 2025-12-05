@@ -38,8 +38,8 @@ void setupVertexes()
 {
     nodeList = 
     {
-    {15.72f, 40.74f, {}, {}, 0, false, 0},
-    {15.72f, 38.46f, {}, {}, 1, false, 1},
+    {15.72f, 40.74f, {}, {}, 0, true, 0},
+    {15.72f, 38.46f, {}, {}, 1, true, 1},
     {21.84f, 35.04f, {}, {}, 1, false, 2},
     {21.72f, 31.26f, {}, {}, 1, false, 3},
     {21.78f, 26.94f, {}, {}, 1, false, 4},
@@ -47,7 +47,7 @@ void setupVertexes()
     {21.78f, 18.54f, {}, {}, 1, false, 6},
     {21.72f, 14.40f, {}, {}, 1, false, 7},
     {21.78f, 10.32f, {}, {}, 1, false, 8},
-    {15.84f,  5.04f, {}, {}, 1, false, 9},
+    {15.84f,  5.04f, {}, {}, 1, true, 9},
     {10.14f,  9.78f, {}, {}, 1, false, 10},
     {10.14f, 14.82f, {}, {}, 1, false, 11},
     {10.08f, 18.90f, {}, {}, 1, false, 12},
@@ -55,17 +55,17 @@ void setupVertexes()
     {10.02f, 27.36f, {}, {}, 1, false, 14},
     {10.14f, 31.26f, {}, {}, 1, false, 15},
     {10.02f, 35.58f, {}, {}, 1, false, 16},
-    {15.72f, 23.16f, {}, {}, 1, false, 17},
-    {15.84f, 50.28f, {}, {}, 0, false, 18},
-    {15.84f, 48.00f, {}, {}, 2, false, 19},
+    {15.72f, 23.16f, {}, {}, 1, true, 17},
+    {15.84f, 50.28f, {}, {}, 0, true, 18},
+    {15.84f, 48.00f, {}, {}, 2, true, 19},
     {21.60f, 43.68f, {}, {}, 2, false, 20},
-    {15.72f, 42.12f, {}, {}, 2, false, 21},
+    {15.72f, 42.12f, {}, {}, 2, true, 21},
     { 8.28f, 43.98f, {}, {}, 2, false, 22},
-    {14.52f, 91.74f, {}, {}, 0, false, 23},
-    {14.52f, 87.30f, {}, {}, 3, false, 24},
+    {14.52f, 91.74f, {}, {}, 0, true, 23},
+    {14.52f, 87.30f, {}, {}, 3, true, 24},
     {30.42f, 85.98f, {}, {}, 3, false, 25},
-    {29.40f, 78.66f, {}, {}, 3, false, 26},
-    {32.34f, 78.54f, {}, {}, 0, false, 27},
+    {29.40f, 78.66f, {}, {}, 3, true, 26},
+    {32.34f, 78.54f, {}, {}, 0, true, 27},
     {29.22f, 74.22f, {}, {}, 3, false, 28},
     {30.30f, 70.50f, {}, {}, 3, false, 29},
     {30.30f, 66.90f, {}, {}, 3, false, 30},
@@ -73,7 +73,7 @@ void setupVertexes()
     {30.30f, 58.50f, {}, {}, 3, false, 32},
     {30.30f, 54.30f, {}, {}, 3, false, 33},
     {24.00f, 52.32f, {}, {}, 3, false, 34},
-    {15.84f, 52.56f, {}, {}, 3, false, 35},
+    {15.84f, 52.56f, {}, {}, 3, true, 35},
     {10.20f, 54.78f, {}, {}, 3, false, 36},
     {10.20f, 58.68f, {}, {}, 3, false, 37},
     {10.20f, 62.88f, {}, {}, 3, false, 38},
@@ -83,8 +83,8 @@ void setupVertexes()
     {10.20f, 78.72f, {}, {}, 3, false, 42},
     {10.20f, 82.62f, {}, {}, 3, false, 43},
     {10.20f, 86.82f, {}, {}, 3, false, 44},
-    {21.06f, 78.66f, {}, {}, 3, false, 45},
-    {18.60f, 65.10f, {}, {}, 3, false, 46}
+    {21.06f, 78.66f, {}, {}, 3, true, 45},
+    {18.60f, 65.10f, {}, {}, 3, true, 46}
     };
 
     auto link = [&](int from, int to, float dist, float head)
@@ -496,7 +496,7 @@ int createMessageId() {
 String createUpdate() {
     //Create message updating current state, currently only pos
     //String message = "<uppdate>|:pos:" + String(currentRobot.pos->x) + "," + String(currentRobot.pos->y) + ":currentVertex:" + currentRobot.currentVertex.id + ":battery:" + String(checkBattery()) + "|";
-    String message = "<Uppdate>:1:" + currentRobot.macAddress + ":2:" + currentRobot.currentVertex->room + ":3:" + currentRobot.taskedRoom + ":4:" + currentRobot.currentVertex->checked + ":5:" + currentRobot.currentVertex->id + ":6:" + currentRobot.battery + ":5:";
+    String message = "<Uppdate>:1:" + currentRobot.macAddress + ":2:" + currentRobot.currentVertex->room + ":3:" + currentRobot.taskedRoom + ":4:" + currentRobot.currentVertex->checked + ":5:" + currentRobot.currentVertex->id + ":6:" + currentRobot.battery + ":7:";
     return message;
 }
 
@@ -513,47 +513,64 @@ void dealWithMessage(Message msg)
 {
     String message = msg.messsage;
 
-    if (isMaster)
+    if(message.indexOf("<Uppdate>") > -1)
     {
-        if(message.indexOf("<uppdate>") > -1)
+        Serial.println("Master: " + message);
+        
+        String mac = message.substring(message.indexOf(":1:") + 3, message.indexOf(":2:"));
+        int currentRoom = message.substring(message.indexOf(":2:") + 3, message.indexOf(":3:")).toInt();
+        int taskedRoom = message.substring(message.indexOf(":3:") + 3, message.indexOf(":4:")).toInt();
+        bool checked = message.substring(message.indexOf(":4:") + 3, message.indexOf(":5:"));
+        int id = message.substring(message.indexOf(":5:") + 3, message.indexOf(":6:")).toInt();
+        int battery = message.substring(message.indexOf(":6:") + 3, message.indexOf(":6:")).toDouble();
+
+        Serial.println("update info -> Mac: " + mac + "  currentroom: " + String(currentRoom) + "   tasked room: " + String(taskedRoom) + "  checked: " + checked + "   id: " + String(id) + "    battery: " + String(battery));
+
+        for(int i = 0; i < robotList.size(); i++)
         {
-            Serial.println("Master: " + message);
-
-
-        }
-        else if(message.indexOf("<instructions>") > -1)
-        {
-            Serial.println("Master: " + message);
-
-            
-            
-            int lastInstanceIndex = 0;
-            while(message.indexOf(":1:", lastInstanceIndex) != -1)
+            if (robotList[i].macAddress.equals(mac))
             {
-                int beginning = message.indexOf(":1:", lastInstanceIndex)+3;
-                int end = message.indexOf(":2:", message.indexOf(":1:", lastInstanceIndex) + 3);
-                
-                if (message.substring(beginning, end).equals(currentRobot.macAddress))
+                robotList[i].taskedRoom = taskedRoom;
+                robotList[i].currentVertex = &nodeList[id];
+                robotList[i].battery = battery;
+                if((taskedRoom == currentRoom) && (checked == true))
                 {
-                    beginning = message.indexOf(":2:", lastInstanceIndex)+3;
-                    end = message.indexOf(":3:", message.indexOf(":2:", lastInstanceIndex) + 3);
-
-                    currentRobot.taskedRoom = message.substring(beginning, end).toInt();
+                    robotList[i].currentVertex->checked = true;
                 }
-
-                lastInstanceIndex = end;
-                
+                break;
             }
-                
         }
-        //Fixaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
     }
-    else
+    else if(message.indexOf("<instructions>") > -1)
     {
-        Serial.println("slave: " + message);
+        Serial.println("Master: " + message);
+
+        
+        
+        int lastInstanceIndex = 0;
+        while(message.indexOf(":1:", lastInstanceIndex) != -1)
+        {
+            int beginning = message.indexOf(":1:", lastInstanceIndex)+3;
+            int end = message.indexOf(":2:", message.indexOf(":1:", lastInstanceIndex) + 3);
+            
+            if (message.substring(beginning, end).equals(currentRobot.macAddress))
+            {
+                beginning = message.indexOf(":2:", lastInstanceIndex)+3;
+                end = message.indexOf(":3:", message.indexOf(":2:", lastInstanceIndex) + 3);
+
+                currentRobot.taskedRoom = message.substring(beginning, end).toInt();
+            }
+
+            lastInstanceIndex = end;
+            
+        }
+            
     }
 }
+
+
+//std::vector<String> 
 
 
 void run() {
@@ -568,7 +585,10 @@ void run() {
 
     Message temp;
     temp.messsage = plan();
+    temp.time = millis();
+    //temp.messageId();
     //skicka till alla robotar
+    
     dealWithMessage(temp);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
@@ -631,6 +651,7 @@ void setUp() {
 
 
     detectionSetUp();
+    //setup_communication();
 
 
     run();
