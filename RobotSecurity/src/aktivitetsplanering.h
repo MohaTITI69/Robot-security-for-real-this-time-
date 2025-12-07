@@ -64,6 +64,7 @@ extern bool isMaster;
 // ---- function declarations ----
 
 void dealWithMessage(Message msg);
+void runningServerChecks(void * parameter);
 Message receiveMessage();
 void runningReceiveMessages(void * parameter);
 void broadcast(Message message);

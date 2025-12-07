@@ -5,6 +5,8 @@
 #include "Communication.h"
 #include "Detection.h"
 #include "movement.hpp"
+#include "Node.h"
+#include "WifiServerCom.h"
 
 
 #define TRIG_PIN 13
@@ -24,6 +26,7 @@ nodeRobot currentRobot;
 std::vector<Vertex> nodeList;//positioner
 std::vector<nodeRobot> robotList;//kopplade robbotar
 bool isMaster = false;
+std::vector<String> receivedMsg;
 
 
 /*
@@ -33,6 +36,7 @@ bool isMaster = false;
 4.När instruktioner klar, aktivera klar metoden och vänta på instruktion
 5.gå tillbaka till steg 2 eftersom den master
 */
+
 
 void setupVertexes()
 {
@@ -287,18 +291,34 @@ void broadcast(Message message) {
     // Förmedla position och ID
 
     //sendMessage(getPosition(), getMacAddress());
+    //send_msg_bcast(message.messsage);
 
 }
 
 
-void sendMessageToServer() {
+void sendMessageToServer(Message msg) 
+{
     // Skickar position/ID
     // Inkludera sig själv som master
+
+    //send_msg_bcast(msg.messsage);
+    Serial.println("send to server: " + msg.messsage);
+
+    if (!sendToServer(msg.messsage)) {
+        Serial.println("sendMessageToServer: FAILED to send to Java-server");
+    }
+    
 
 }
 
 
 Message receiveMessage() {
+
+
+    String temp = receivedMsg.begin();
+    receivedMsg.erase(receivedMsg.begin());
+
+    dealWithMessage(receivedMsg);
 
     Message temp;
     temp.messageId = 0;
@@ -311,6 +331,8 @@ Message receiveMessage() {
     // Unika robotID och vem som är master
     
 }
+
+
 
 
 void navigate(const std::vector<Vertex*>& path) {
@@ -409,6 +431,7 @@ void startNetwork()
 
     
     //xTaskCreatePinnedToCore(runningUpdateMessages, "runningUpdateMessages", 4096, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(runningServerChecks, "runningServerChecks", 4096, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(runningUpdateMessages, "runningUpdateMessages", 4096, NULL, 1, NULL, 1);  //För att kontinuerligt skicka updates
     xTaskCreatePinnedToCore(runningReceiveMessages, "runningReceiveMessages", 4096, NULL, 1, NULL, 1);  //För att kontinuerligt ta emot medelanden
 
@@ -436,6 +459,15 @@ void runningReceiveMessages(void * parameter)
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
     vTaskDelete(NULL);
+}
+
+
+void runningServerChecks(void * parameter)
+{
+    while(true)
+    {
+        wifiServerLoop();
+    }
 }
 
 // Skapar instruktioner för alla robotar-------------------------------
@@ -578,8 +610,6 @@ void run() {
   // While-loop eller liknande
   // T.ex. olika logik om master/slave
 
-  createMaster();
-  startNetwork();
 
   while(isMaster) {
 
@@ -588,9 +618,12 @@ void run() {
     temp.time = millis();
     //temp.messageId();
     //skicka till alla robotar
-    
+    //test
+    sendMessageToServer(temp);
+    Serial.println();
     dealWithMessage(temp);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    Serial.println();
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
 
   }
 
@@ -602,11 +635,14 @@ void run() {
     message.messageId = createMessageId();
     message.messsage = createUpdate();
     broadcast(message);
+/* 
+    doTask()
 
     for (int i = msgCount; i > 0; i--)
     {
         dealWithMessage(receiveMessage());
     }
+     */
   }
 }
 
@@ -650,8 +686,11 @@ void setUp() {
     robotList.push_back(currentRobot);
 
 
+    createMaster();
+    //startNetwork();
     detectionSetUp();
-    //setup_communication();
+    setup_communication();
+    wifiServerSetup();
 
 
     run();

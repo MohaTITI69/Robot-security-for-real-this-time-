@@ -11,4 +11,7 @@ struct Node {
     unsigned long lastSeen;
 };
 
+
+extern Node nodes[MAX_NODES];
+
 #endif

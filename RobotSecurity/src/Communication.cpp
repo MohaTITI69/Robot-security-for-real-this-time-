@@ -1,7 +1,8 @@
 #include "Communication.h"
 #include "Node.h"
+#include "aktivitetsplanering.h"
 
-extern Node nodes[MAX_NODES];
+Node nodes[MAX_NODES];
 uint8_t selfMac[6];
 
 bool sameMac(const uint8_t a[6], const uint8_t b[6]) {
@@ -96,14 +97,13 @@ void onRecv(const uint8_t* mac, const uint8_t* data, int len) {
 
   //HÄR ANVÄNDER NI MSG SOM STRÄNG TILL VAD SOM HÄLST, GÄRNA SKICKA DEN VIDARE TILL EN ANNAN FUNKTION
   String msg = bytesToString(data, len);
-
-    if(msg == "W")
-    {
-      Serial.print("W recieved \n");
-      ledBlink();
-    }
+    handleMsg(msg);
   }
 
+}
+
+void handleMsg(String msg) {
+    receivedMsg.push_back(msg);
 }
 
 void heartbeatSender(void*) {
@@ -226,11 +226,10 @@ void setup_communication(){
   pinMode(msgRecPin, OUTPUT);
   digitalWrite(connectedPin, HIGH);
 
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect(true, true);
-  esp_wifi_set_ps(WIFI_PS_NONE);
-  esp_wifi_set_channel(WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE);
-
+  // WiFi är redan uppkopplat i wifiServerSetup().
+  // Viktigt: INTE disconnecta eller byta kanal här.
+  WiFi.mode(WIFI_STA);            // ofarligt att kalla igen
+  esp_wifi_set_ps(WIFI_PS_NONE);  // power-save av
 
   if (esp_now_init() != ESP_OK) {
     Serial.println("ESPNOW init failed");
@@ -241,13 +240,15 @@ void setup_communication(){
   esp_now_register_send_cb(onSent);
 
   esp_now_peer_info_t peer{};
+  memset(&peer, 0, sizeof(peer));
   memcpy(peer.peer_addr, BCAST, 6);
   peer.ifidx = WIFI_IF_STA;
-  peer.channel = WIFI_CHANNEL;
+  peer.channel = 0;          // 0 = följ nuvarande WiFi-kanal (AP:ens kanal)
   peer.encrypt = false;
   esp_now_add_peer(&peer);
 
   xTaskCreatePinnedToCore(heartbeatSender, "Heartbeat", 4096, NULL, 1, NULL, 0);
-  xTaskCreatePinnedToCore(nodeTimeoutChecker, "TimeoutCheck", 4096, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(nodeTimeoutChecker, "TimeoutCheck", 4096, NULL, 1, NULL, 0);
 }
+
 

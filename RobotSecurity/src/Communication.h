@@ -11,7 +11,7 @@
 #include <algorithm>
 
 
-#define WIFI_CHANNEL 6
+#define WIFI_CHANNEL 1
 #define connectedPin 33
 #define msgRecPin 26
 
